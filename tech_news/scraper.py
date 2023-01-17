@@ -30,8 +30,16 @@ def scrape_updates(html_content: str) -> List:
 
 
 # Requisito 3
-def scrape_next_page_link(html_content):
+def scrape_next_page_link(html_content: str) -> Union[str, None]:
     """Seu código deve vir aqui"""
+    selector = Selector(html_content)
+
+    try:
+        next_page = selector.css(".next").attrib['href']
+    except KeyError:
+        return None
+
+    return next_page
 
 
 # Requisito 4
