@@ -43,8 +43,24 @@ def search_by_date(date_string: str) -> List[Union[Tuple, None]]:
 
 
 # Requisito 8
-def search_by_tag(tag):
+def search_by_tag(tag: str) -> List[Union[Tuple, None]]:
     """Seu código deve vir aqui"""
+    response_db = search_news({
+        "tags": {
+            "$regex": tag,
+            "$options": "i"
+        }
+    })
+
+    list_news = list()
+    if len(response_db) != 0:
+        list_news = generate_tuple(response_db)
+
+    return list_news
+
+
+if __name__ == '__main__':
+    print(search_by_tag("TEcnologia"))
 
 
 # Requisito 9
