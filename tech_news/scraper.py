@@ -1,8 +1,9 @@
 from time import sleep
+import re
 import requests
 from parsel import Selector
 from typing import List, Union, Dict
-import re
+from tech_news.database import create_news
 
 
 # Requisito 1
@@ -71,5 +72,23 @@ def scrape_news(html_content) -> Dict:
 
 
 # Requisito 5
-def get_tech_news(amount):
+def get_tech_news(amount: int) -> List[Dict]:
     """Seu código deve vir aqui"""
+    url = 'https://blog.betrybe.com/'
+    news = list()
+    lis_href_tech_news = list()
+
+    while len(lis_href_tech_news) <= amount:
+        base_html = fetch(url)
+        lis_href_tech_news.extend(scrape_updates(base_html))
+
+        if len(lis_href_tech_news) < amount:
+            url = scrape_next_page_link(base_html)
+
+    for href_tech_news in lis_href_tech_news[:amount]:
+        tech_news = fetch(href_tech_news)
+        scrape = scrape_news(tech_news)
+        news.append(scrape)
+
+    create_news(news)
+    return news
