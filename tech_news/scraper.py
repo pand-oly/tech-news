@@ -1,7 +1,8 @@
 from time import sleep
 import requests
 from parsel import Selector
-from typing import List, Union
+from typing import List, Union, Dict
+import re
 
 
 # Requisito 1
@@ -22,7 +23,7 @@ def fetch(url: str) -> Union[str, None]:
 
 
 # Requisito 2
-def scrape_updates(html_content: str) -> List:
+def scrape_updates(html_content: str) -> List[str]:
     """Seu código deve vir aqui"""
     selector = Selector(html_content)
     list_href = selector.css(".cs-overlay a::attr(href)").getall()
@@ -35,7 +36,7 @@ def scrape_next_page_link(html_content: str) -> Union[str, None]:
     selector = Selector(html_content)
 
     try:
-        next_page = selector.css(".next").attrib['href']
+        next_page = selector.css(".next").attrib["href"]
     except KeyError:
         return None
 
@@ -43,8 +44,30 @@ def scrape_next_page_link(html_content: str) -> Union[str, None]:
 
 
 # Requisito 4
-def scrape_news(html_content):
+def scrape_news(html_content) -> Dict:
     """Seu código deve vir aqui"""
+    selecttor = Selector(html_content)
+
+    get_comment = selecttor.css("#comments h5::text").get()
+    if get_comment is None:
+        comment = [0]
+    else:
+        comment = get_comment.strip().split()
+        if comment[1] == 'comments':
+            comment = get_comment[0]
+
+    first_paragraph = selecttor.css(".entry-content p").get()
+
+    return {
+        "url": selecttor.css("link[rel='canonical']").attrib["href"],
+        "title": selecttor.css("h1.entry-title::text").get().strip(),
+        "timestamp": selecttor.css("li[class='meta-date']::text").get(),
+        "writer": selecttor.css("a[class='url fn n']::text").get(),
+        "comments_count": int(comment[0]),
+        "summary": re.sub('<[^>]+?>', '', first_paragraph).strip(),
+        "tags": selecttor.css(".post-tags li a::text").getall(),
+        "category": selecttor.css("a.category-style span.label::text").get()
+    }
 
 
 # Requisito 5
