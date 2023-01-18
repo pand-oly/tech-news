@@ -59,10 +59,23 @@ def search_by_tag(tag: str) -> List[Union[Tuple, None]]:
     return list_news
 
 
-if __name__ == '__main__':
-    print(search_by_tag("TEcnologia"))
-
-
 # Requisito 9
-def search_by_category(category):
+def search_by_category(category: str) -> List[Union[Tuple, None]]:
     """Seu código deve vir aqui"""
+    response_db = search_news({
+        "category": {
+            "$regex": category,
+            "$options": "i"
+        }
+    })
+
+    list_news = list()
+    if len(response_db) != 0:
+        list_news = generate_tuple(response_db)
+
+    return list_news
+
+
+if __name__ == '__main__':
+    print(search_by_category("Ferramentas"))
+
