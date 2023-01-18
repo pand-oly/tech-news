@@ -74,8 +74,3 @@ def search_by_category(category: str) -> List[Union[Tuple, None]]:
         list_news = generate_tuple(response_db)
 
     return list_news
-
-
-if __name__ == '__main__':
-    print(search_by_category("Ferramentas"))
-
